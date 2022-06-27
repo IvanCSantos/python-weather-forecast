@@ -1,5 +1,6 @@
 import requests
 import json
+from datetime import datetime
 
 location = input("Informe o nome da cidade que deseja a localização: ")
 # Geocoding API
@@ -50,4 +51,52 @@ parameters = {
 }
 response = requests.get(API_FCST, params=parameters)
 print(response.status_code)
-print(json.dumps(response.json(), indent=4))
+
+forecasts = []
+for weather in response.json()['list']:
+  day = datetime.fromtimestamp(weather['dt']).day
+  min = weather['main']['temp_min']
+  max = weather['main']['temp_max']
+  main = str(weather['weather'][0]['main'])
+  description = str(weather['weather'][0]['description'])
+  if(len(forecasts) >= 1):
+    if(forecasts[-1]['day'] == day):
+      if(forecasts[-1]['min'] > min):
+        forecasts[-1]['min'] = min
+      if(forecasts[-1]['max'] < max):
+        forecasts[-1]['max'] = max
+      if(main == 'Rain'):
+        forecasts[-1]['main'] = main
+        forecasts[-1]['description'] = description
+      if(main == 'Clouds' and forecasts[-1]['main'] != 'Rain'):
+        forecasts[-1]['main'] = main
+        if(forecasts[-1]['main'] != 'Clouds'):
+          forecasts[-1]['description'] = description
+        else:
+          if(forecasts[-1]['description'] != 'nublado' and description == 'nublado'):
+            forecasts[-1]['description'] = description
+      continue
+  forecasts.append({
+    'day' : day,
+    'min' : min,
+    'max' : max,
+    'main' : main,
+    'description' : description
+  })
+
+print("\n\n\n")
+for forecast in forecasts:
+  print("Dia: " + str(forecast['day']) + ":")
+  #print("Temperatura: " + str(forecast['temp']))
+  print("Mínima: " + str(forecast['min']) + "°")
+  print("Máxima: " + str(forecast['max']) + "°")
+  print("Previsão: " + str(forecast['main']))
+  print("Descrição: " + str(forecast['description']))
+  print("\n")
+
+#DEBUG
+#for weather in response.json()['list']:
+#  print(str(datetime.fromtimestamp(weather['dt'])) + "--> " + weather['dt_txt'])
+#for weather in response.json()['list']:
+#  print(str(datetime.fromtimestamp(weather['dt'])) + ", " + str(weather['main']['temp']) + ", " + str(weather['main']['temp_min']) + ", " + str(weather['main']['temp_max']) + ", " + str(weather['weather'][0]['main']) + ", " + str(weather['weather'][0]['description']))
+#print(json.dumps(response.json(), indent=4))
