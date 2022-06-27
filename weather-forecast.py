@@ -1,6 +1,50 @@
 import requests
 import json
 from datetime import datetime
+import tkinter as tk
+
+APP_NAME = "Python Weather Forecast"
+
+def clearUserInput():
+  pass
+
+def confirmUserInput():
+  pass
+
+# Creating a Tkinter screen
+root = tk.Tk()
+root.title(APP_NAME)
+root.geometry("600x300")
+# Screen color=#2a82b4
+
+# Defining and inserting user input field and buttons
+userInput = tk.Entry(border=2, width=20, font=("Arial", 20)).grid(row=0, column=0, columnspan=2, padx=10, pady=10)
+btnOK = tk.Button(text="Confirmar", background="green", command=confirmUserInput).grid(row=0, column=2)
+btnCancel = tk.Button(text="Limpar", background="green", command=clearUserInput).grid(row=0, column=3)
+
+# Defining and inserting forecast data labels
+today = tk.Label(text="Temperatura atual:").grid(row=1, column=0)
+today = tk.Label(text="Hoje:").grid(row=2, column=0)
+today = tk.Label(text="Previsão:").grid(row=3, column=0)
+today = tk.Label(text="Descrição:").grid(row=4, column=0)
+today = tk.Label(text="Máxima:").grid(row=5, column=0)
+today = tk.Label(text="Mínima:").grid(row=6, column=0)
+
+
+today = tk.Label(text="Amanhã").grid(row=2, column=1)
+
+today = tk.Label(text="Depois").grid(row=2, column=2)
+
+today = tk.Label(text="Depois2").grid(row=2, column=3)
+
+today = tk.Label(text="Depois3").grid(row=2, column=4)
+
+
+# Program loop
+root.mainloop()
+
+
+# ------ 
 
 location = input("Informe o nome da cidade que deseja a localização: ")
 # Geocoding API
@@ -84,7 +128,7 @@ for weather in response.json()['list']:
     'description' : description
   })
 
-print("\n\n\n")
+print("\n\n")
 for forecast in forecasts:
   print("Dia: " + str(forecast['day']) + ":")
   #print("Temperatura: " + str(forecast['temp']))
