@@ -33,6 +33,21 @@ parameters = {
   "lang" : "pt_br",
   "units" : "metric"
 }
-response = requests.get(API_OWM, params=parameters)
+#response = requests.get(API_OWM, params=parameters)
+#print(response.status_code)
+#print(json.dumps(response.json(), indent=4))
+
+# Call 5 day / 3 hour forecast data
+# https://openweathermap.org/forecast5
+# https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={API key}
+API_FCST = "https://api.openweathermap.org/data/2.5/forecast"
+parameters = {
+  "lat" : latitude,
+  "lon" : longitude,
+  "appid" : API_KEY,
+  "lang" : "pt_br",
+  "units" : "metric"
+}
+response = requests.get(API_FCST, params=parameters)
 print(response.status_code)
 print(json.dumps(response.json(), indent=4))
