@@ -16,9 +16,16 @@ root.title(APP_NAME)
 root.geometry("600x300")
 # Screen color=#2a82b4
 
+# Load images
+imgCloud = Image.open('cloud2.png')
+piCloud = ImageTk.PhotoImage(imgCloud)
+imgRain = Image.open('rain2.jpg')
+piRain = ImageTk.PhotoImage(imgRain)
+imgSun = Image.open('sun2.png')
+piSun = ImageTk.PhotoImage(imgSun)
+
 
 def getGeoLocation(locationName):
-  #location = input("Informe o nome da cidade que deseja a localização: ")
   location = locationName
   # Geocoding API
   # https://openweathermap.org/api/geocoding-api
@@ -32,10 +39,6 @@ def getGeoLocation(locationName):
   if(response.status_code == 200):
     latitude = response.json()[0]['lat']
     longitude = response.json()[0]['lon']
-  # Dados para Itajai / SC:
-  # https://www.google.com.br/maps/@-26.9162788,-48.6665522,16.47z
-  #print("Latitude: " + str(latitude))
-  #print("Longitude: " + str(longitude))
   return latitude, longitude
 
 
@@ -70,7 +73,6 @@ def getFiveDaysForecast(latitude, longitude):
     "units" : "metric"
   }
   response = requests.get(API_FCST, params=parameters)
-  #print(response.status_code)
   forecasts = []
   for weather in response.json()['list']:
     day = datetime.fromtimestamp(weather['dt']).day
@@ -81,7 +83,7 @@ def getFiveDaysForecast(latitude, longitude):
     main = str(weather['weather'][0]['main'])
     description = str(weather['weather'][0]['description'])
     if(len(forecasts) >= 1):
-      if(forecasts[-1]['day'] == day):
+      if(forecasts[-1]['day'] == date):
         if(forecasts[-1]['min'] > min):
           forecasts[-1]['min'] = min
         if(forecasts[-1]['max'] < max):
@@ -122,34 +124,56 @@ def getFiveDaysForecast(latitude, longitude):
 #  print(str(datetime.fromtimestamp(weather['dt'])) + ", " + str(weather['main']['temp']) + ", " + str(weather['main']['temp_min']) + ", " + str(weather['main']['temp_max']) + ", " + str(weather['weather'][0]['main']) + ", " + str(weather['weather'][0]['description']))
 #print(json.dumps(response.json(), indent=4))
 
+def getWeatherImage(weather):
+  if weather == 'Rain':
+    return piRain
+  if weather == 'Clouds':
+    return piCloud
+  if weather == 'Clear':
+    return piSun
+
 def updateScreenForecast(currentWeather, fiveDaysForecast):
-  print(fiveDaysForecast)
   # Day 1
-  currentTemp.set(str(currentWeather['temp']) + "°")
+  currentTemp.set("AGORA: " + str(currentWeather['temp']) + "°")
+  weatherImg = getWeatherImage(str(fiveDaysForecast[0]['main']))
+  img1.configure(image=weatherImg)
+  img1.image = weatherImg
   description1.set(str(fiveDaysForecast[0]['description']))
   day1.set(str(fiveDaysForecast[0]['day']))
   min1.set("Min: " + str(fiveDaysForecast[0]['min']) + "°")
   max1.set("Max: " + str(fiveDaysForecast[0]['max']) + "°")
 
   # Day 2
+  weatherImg = getWeatherImage(str(fiveDaysForecast[1]['main']))
+  img2.configure(image=weatherImg)
+  img2.image = weatherImg
   description2.set(str(fiveDaysForecast[1]['description']))
   day2.set(str(fiveDaysForecast[1]['day']))
   min2.set("Min: " + str(fiveDaysForecast[1]['min']) + "°")
   max2.set("Max: " + str(fiveDaysForecast[1]['max']) + "°")
 
   # Day 3
+  weatherImg = getWeatherImage(str(fiveDaysForecast[2]['main']))
+  img3.configure(image=weatherImg)
+  img3.image = weatherImg
   description3.set(str(fiveDaysForecast[2]['description']))
   day3.set(str(fiveDaysForecast[2]['day']))
   min3.set("Min: " + str(fiveDaysForecast[2]['min']) + "°")
   max3.set("Max: " + str(fiveDaysForecast[2]['max']) + "°")
 
   # Day 4
+  weatherImg = getWeatherImage(str(fiveDaysForecast[3]['main']))
+  img4.configure(image=weatherImg)
+  img4.image = weatherImg
   description4.set(str(fiveDaysForecast[3]['description']))
   day4.set(str(fiveDaysForecast[3]['day']))
   min4.set("Min: " + str(fiveDaysForecast[3]['min']) + "°")
   max4.set("Max: " + str(fiveDaysForecast[3]['max']) + "°")
 
   # Day 5
+  weatherImg = getWeatherImage(str(fiveDaysForecast[4]['main']))
+  img5.configure(image=weatherImg)
+  img5.image = weatherImg
   description5.set(str(fiveDaysForecast[4]['description']))
   day5.set(str(fiveDaysForecast[4]['day']))
   min5.set("Min: " + str(fiveDaysForecast[4]['min']) + "°")
@@ -159,22 +183,27 @@ def updateScreenForecast(currentWeather, fiveDaysForecast):
 def clearUserInput():
   userInput.delete(0, END)
   currentTemp.set("")
+  img1.configure(image='')
   description1.set("")
   day1.set("")
   min1.set("")
   max1.set("")
+  img2.configure(image='')
   description2.set("")
   day2.set("")
   min2.set("")
   max2.set("")
+  img3.configure(image='')
   description3.set("")
   day3.set("")
   min3.set("")
   max3.set("")
+  img4.configure(image='')
   description4.set("")
   day4.set("")
   min4.set("")
   max4.set("")
+  img5.configure(image='')
   description5.set("")
   day5.set("")
   min5.set("")
@@ -183,6 +212,7 @@ def clearUserInput():
 
 def confirmUserInput():
   location = userInput.get()
+  clearUserInput()
   latitude, longitude = getGeoLocation(location)
   fiveDaysForecast = getFiveDaysForecast(latitude, longitude)
   currentWeather = getCurrentWeather(latitude, longitude)
@@ -201,7 +231,12 @@ btnCancel = Button(text="Limpar", background="green", command=clearUserInput).gr
 #currentWeather = Label(image=currentWeatherPicture)
 #currentWeather.grid(row=1, column=0)
 
+
 ## Day 1
+# Image
+img1 = Label()
+img1.grid(row=2, column=0)
+
 # Current temperature
 currentTemp = StringVar()
 currentTemp.set("")
@@ -228,6 +263,10 @@ max1.set("")
 lblMax1 = Label(textvariable=max1).grid(row=6, column=0)
 
 ## Day 2
+# Image
+img2 = Label()
+img2.grid(row=2, column=1)
+
 # Temperature description
 description2 = StringVar()
 description2.set("")
@@ -249,6 +288,10 @@ max2.set("")
 lblMax2 = Label(textvariable=max2).grid(row=6, column=1)
 
 ## Day 3
+# Image
+img3 = Label()
+img3.grid(row=2, column=2)
+
 # Temperature description
 description3 = StringVar()
 description3.set("")
@@ -270,6 +313,10 @@ max3.set("")
 lblMax3 = Label(textvariable=max3).grid(row=6, column=2)
 
 ## Day 4
+# Image
+img4 = Label()
+img4.grid(row=2, column=3)
+
 # Temperature description
 description4 = StringVar()
 description4.set("")
@@ -291,6 +338,10 @@ max4.set("")
 lblMax4 = Label(textvariable=max4).grid(row=6, column=3)
 
 ## Day 5
+# Image
+img5 = Label()
+img5.grid(row=2, column=4)
+
 # Temperature description
 description5 = StringVar()
 description5.set("")
